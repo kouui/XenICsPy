@@ -19,7 +19,6 @@ class MainWidget(QWidget):
 
         #--- figure
         figure = MyMplCanvas(parent=self, width=6, height=6, isAxis=False)
-        self.figure = figure
 
         #---control panel
         control = ControlPanel(self)
@@ -37,6 +36,13 @@ class MainWidget(QWidget):
         mainLayout.addWidget(figure,stretch=5)
 
         self.setLayout(mainLayout)
+
+        #-- set self
+        self.setSelf(figure=figure)
+
+    def setSelf(self, **kwags):
+        for key, value in kwags.items():
+            setattr(self, key, value)
 
 
 

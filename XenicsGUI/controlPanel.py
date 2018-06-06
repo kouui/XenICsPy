@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QTextEdit, QPushButton
 
 from previewPanel import PreviewPanel
+from setPanel import SetPanel
 
 
 class ControlPanel(QWidget):
@@ -17,11 +18,20 @@ class ControlPanel(QWidget):
 
         # setup layout
 
-        preview = PreviewPanel(self.parent)
+        preview = PreviewPanel(self)
+        set = SetPanel(self)
 
+        mainLayout.addWidget(set)
         mainLayout.addWidget(preview)
 
         self.setLayout(mainLayout)
+
+        #-- set self
+        self.setSelf(preview=preview, set=set)
+
+    def setSelf(self, **kwags):
+        for key, value in kwags.items():
+            setattr(self, key, value)
 
 
 

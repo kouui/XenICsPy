@@ -4,8 +4,6 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QTextEdit, QPushButton, QLabel
 
-import time
-
 
 class PreviewPanel(QWidget):
 
@@ -40,14 +38,17 @@ class PreviewPanel(QWidget):
 
     def previewStart(self, event):
 
-        #self.parent.logWidget.insertPlainText("preview started. \n")
+        self.parent.parent.logWidget.insertPlainText("preview started. \n")
+
         self.start.setEnabled(False);self.stop.setEnabled(True)
+        self.parent.set.setEnabled(False)
 
 
     def previewStop(self, event):
 
-        #self.parent.logWidget.insertPlainText("preview stopped. \n")
+        self.parent.parent.logWidget.insertPlainText("preview stopped. \n")
         self.start.setEnabled(True);self.stop.setEnabled(False)
+        self.parent.set.setEnabled(True)
 
     def setSelf(self, **kwags):
         for key, value in kwags.items():
