@@ -18,17 +18,17 @@ class MainWindow(QMainWindow):
         self.left = 100
         self.top = 100
         self.width = 1100
-        self.height = 600
+        self.height = 700
 
         self.initUI()
 
     def initUI(self):
 
         self.setWindowTitle(self.title)
-        #self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setGeometry(self.left, self.top, self.width, self.height)
 
         #--- add statusbar
-        self.statusBar().showMessage("message from statusbar!")
+        self.statusBar().showMessage("No message from statusbar!")
 
         #--- add menuBar
         self.addMenuBar()
