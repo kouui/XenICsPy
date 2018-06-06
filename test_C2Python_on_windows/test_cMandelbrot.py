@@ -8,7 +8,7 @@ import numpy as np
 
 if __name__=="__main__":
 
-    lib = ctypes.CDLL('./cMandelbrot.dll')
+    lib = ctypes.CDLL('/Users/liu/kouui/research/XEVA_ircamera/test_C2Python_on_windows/cMandelbrot.dll')
     mandelbrot = lib.mandelbrot
 
     mandelbrot.restype = None

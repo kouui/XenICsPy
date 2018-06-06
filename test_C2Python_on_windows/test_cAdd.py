@@ -4,11 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-
-
 if __name__=="__main__":
 
-    cLib = ctypes.CDLL('./cAdd.dll')
+    cLib = ctypes.CDLL('/Users/liu/kouui/research/XEVA_ircamera/test_C2Python_on_windows/cAdd.dll')
     cos_ = cLib.cos_
 
     cos_.restype = None
