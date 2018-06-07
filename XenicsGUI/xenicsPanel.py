@@ -2,7 +2,7 @@ import sys
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QFrame
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QRadioButton, QButtonGroup
+from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QRadioButton, QButtonGroup,QCheckBox
 from PyQt5.QtWidgets import QSizePolicy
 
 class XenicsPanel(QFrame):
@@ -143,12 +143,10 @@ class XenicsPanel(QFrame):
         label1 = QLabel("current Camera Temperature (C)", self)
         readTemp = QLineEdit("24.65", self);readTemp.setMaxLength(6);readTemp.setFixedWidth(60)
         readTemp.setReadOnly(True)
-        cooling = QRadioButton("Cooling",self)
-        group = QButtonGroup(self); group.addButton(cooling)
-        empty = QLabel("                                  ",self)
+        cooling = QCheckBox("Cooling",self)
 
         layout1 = QHBoxLayout();layout1.setAlignment(QtCore.Qt.AlignLeft)
-        for item in (label1,readTemp,cooling,empty):
+        for item in (label1,readTemp,cooling):
             layout1.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
