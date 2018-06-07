@@ -26,6 +26,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setFixedSize(self.width,self.height)
 
         #--- add statusbar
         self.statusBar().showMessage("No message from statusbar!")
