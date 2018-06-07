@@ -17,9 +17,9 @@ class XenicsPanel(QFrame):
         mainLayout = QVBoxLayout()
 
         #-- title
-        title = QLabel(">>>---  XenICs  ---<<<", self)
-        title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        title.setAlignment(QtCore.Qt.AlignCenter)
+        #title = QLabel(">>>---  XenICs  ---<<<", self)
+        #title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        #title.setAlignment(QtCore.Qt.AlignCenter)
         #title.setStyleSheet("QLabel {background-color: red;}")
 
 
@@ -39,7 +39,6 @@ class XenicsPanel(QFrame):
         layoutSet = self.makeSettingFile()
 
         #-- add layout and widget
-        mainLayout.addWidget(title)
         mainLayout.addLayout(layoutPreview)
         mainLayout.addLayout(layoutFlipCut)
         mainLayout.addLayout(layoutScale)
@@ -60,16 +59,18 @@ class XenicsPanel(QFrame):
         exposure = QLineEdit("1000")
 
         #-- preview button
-        preview = QPushButton("Start", self)
-        preview.setToolTip('click here to start preview')
+        start = QPushButton("Start", self)
+        start.setToolTip('click here to start preview')
+        stop= QPushButton("stop", self)
+        stop.setToolTip('click here to start preview')
 
         #-- adding to layout
-        for item in (label1, exposure, label2, preview):
+        for item in (label1, exposure, label2, start, stop):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
 
         #-- set attributes
-        self.setSelf(preview=preview, exposure=exposure)
+        self.setSelf(start=start, stop=stop, exposure=exposure)
         return layout
 
     def makeScale(self):

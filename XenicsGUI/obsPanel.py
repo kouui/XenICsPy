@@ -17,9 +17,9 @@ class ObsPanel(QFrame):
         mainLayout = QVBoxLayout()
 
         #-- title
-        title = QLabel(">>>---  Observation  ---<<<", self)
-        title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        title.setAlignment(QtCore.Qt.AlignCenter)
+        #title = QLabel(">>>---  Observation  ---<<<", self)
+        #title.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        #title.setAlignment(QtCore.Qt.AlignCenter)
 
         #-- external trigger
         layoutExttrig = self.makeExtrig()
@@ -27,12 +27,23 @@ class ObsPanel(QFrame):
         layoutPolarity = self.makePolarity()
         #-- get image
         layoutGetImage = self.makeGetImage()
+        #-- observation
+        layoutObserve = self.makeObserve()
+        #-- outdir
+        layoutOutdir = self.makeOutdir()
+        #-- filename
+        layoutFilename = self.makeFilename()
+        #-- load, fitsheader
+        layoutLoad = self.makeLoad()
 
         #-- add layout and widget
-        mainLayout.addWidget(title)
         mainLayout.addLayout(layoutExttrig)
         mainLayout.addLayout(layoutPolarity)
         mainLayout.addLayout(layoutGetImage)
+        mainLayout.addLayout(layoutObserve)
+        mainLayout.addLayout(layoutOutdir)
+        mainLayout.addLayout(layoutFilename)
+        mainLayout.addLayout(layoutLoad)
 
         self.setLayout(mainLayout)
 
@@ -70,9 +81,70 @@ class ObsPanel(QFrame):
 
         label = QLabel("nimg",self)
         nimg = QLineEdit("1",self); nimg.setMaxLength(3)
+        get = QPushButton("Get",self)
+        prof = QPushButton("Prof",self)
+        rev = QPushButton("Rev",self)
+        save = QPushButton("Save",self)
+
 
         layout = QHBoxLayout()
-        for item in (label,nimg):
+        for item in (label,nimg,get,prof,rev,save):
+            layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        return layout
+
+    def makeObserve(self):
+
+        label1 = QLabel("Cadence (sec):",self)
+        cadence = QLineEdit("1.0",self)
+        label2 = QLabel("Observe:",self)
+        start = QPushButton("Start", self)
+        start.setToolTip('click here to start observation')
+        stop= QPushButton("stop", self)
+        stop.setToolTip('click here to start observation')
+
+        layout = QHBoxLayout()
+        for item in (label1,cadence,label2,start,stop):
+            layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        return layout
+
+    def makeOutdir(self):
+
+        label1 = QLabel("Outdir:",self)
+        outdir = QLineEdit("None",self)
+        label2 = QLabel("        prefix:",self)
+        prefix = QLineEdit("xeva_",self)
+
+        layout = QHBoxLayout()
+        for item in (label1,outdir,label2,prefix):
+            layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        return layout
+
+    def makeFilename(self):
+
+        label1 = QLabel("Filename:", self)
+        filename = QLineEdit("xeva_20180607T150505_194",self)
+        label2 = QLabel(".fits",self)
+
+        layout = QHBoxLayout()
+        for item in (label1,filename,label2):
+            layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        return layout
+
+    def makeLoad(self):
+
+        load = QPushButton("Load",self)
+        fitsHeader = QPushButton("Fits Header",self)
+
+        layout = QHBoxLayout()
+        for item in (load,fitsHeader):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
 

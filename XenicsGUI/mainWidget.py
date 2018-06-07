@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QTextEdit, QPushButton
 
-from xenicsPanel import XenicsPanel
+from tabs import Tab
 from figurePanel import MyMplCanvas
 
 
@@ -21,7 +21,7 @@ class MainWidget(QWidget):
         figure = MyMplCanvas(parent=self, width=6, height=6, isAxis=False)
 
         #---control panel
-        xenics = XenicsPanel(self)
+        control = Tab(self)
 
         #--- log
         self.logWidget = QTextEdit()
@@ -29,7 +29,7 @@ class MainWidget(QWidget):
         self.logWidget.insertPlainText("software initialized. \n")
 
         # setup layout
-        layout_v.addWidget(xenics)
+        layout_v.addWidget(control)
         layout_v.addWidget(self.logWidget)
 
         mainLayout.addLayout(layout_v, stretch=3)
