@@ -39,24 +39,20 @@ class XenicsPanel(QFrame):
         layoutSet = self.makeSettingFile()
 
         #-- add layout and widget
-        mainLayout.addLayout(layoutPreview)
-        mainLayout.addLayout(layoutFlipCut)
-        mainLayout.addLayout(layoutScale)
-        mainLayout.addLayout(layoutTemp)
-        mainLayout.addLayout(layoutSet)
+        for item in (layoutPreview,layoutFlipCut,layoutScale,layoutTemp,layoutSet):
+            mainLayout.addLayout(item)
 
         #-- set layout
         self.setLayout(mainLayout)
 
-    def makePreview(self):
 
-        layout = QHBoxLayout()
+    def makePreview(self):
 
         label1 = QLabel("Exposure (ms):", self)
         label2 = QLabel("Preview :", self)
 
         #-- exposure
-        exposure = QLineEdit("1000")
+        exposure = QLineEdit("1000");exposure.setMaxLength(4);exposure.setFixedWidth(40)
 
         #-- preview button
         start = QPushButton("Start", self)
@@ -65,55 +61,20 @@ class XenicsPanel(QFrame):
         stop.setToolTip('click here to start preview')
 
         #-- adding to layout
+        layout = QHBoxLayout();layout.setAlignment(QtCore.Qt.AlignLeft)
         for item in (label1, exposure, label2, start, stop):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         #-- set attributes
         self.setSelf(start=start, stop=stop, exposure=exposure)
         return layout
 
-    def makeScale(self):
-
-        layout = QVBoxLayout()
-        layout1 = QHBoxLayout()
-        layout2 = QHBoxLayout()
-
-        label1 = QLabel("Scale:", self)
-
-        #-- radiobuttuns
-        autoScale = QRadioButton("Auto", self); autoScale.setChecked(True)
-        logScale = QRadioButton("Log", self)
-        clipScale = QRadioButton("Clip: ", self)
-
-        group=QButtonGroup(self)
-        for item in (autoScale,logScale,clipScale):
-            group.addButton(item)
-
-        #-- clip value
-        label2 = QLabel("Max:", self)
-        clipScaleMax = QLineEdit("0")
-        label3 = QLabel("Min:", self)
-        clipScaleMin = QLineEdit("10000")
-
-        #-- adding to layout
-        for item in (label1,autoScale,logScale,clipScale):
-            layout1.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-        for item in (label2,clipScaleMax,label3,clipScaleMin):
-            layout2.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        layout.addLayout(layout1)
-        layout.addLayout(layout2)
-        return layout
-
     def makeFlipAndCut(self):
 
-        layout = QVBoxLayout()
-
         #-- row 1
-        layout1 = QHBoxLayout()
+        layout1 = QHBoxLayout();layout1.setAlignment(QtCore.Qt.AlignLeft)
+
         NoFlip = QRadioButton("No Flip", self); NoFlip.setChecked(True)
         FlipX = QRadioButton("Flip-X", self)
         FlipY = QRadioButton("Flip-Y", self)
@@ -126,65 +87,84 @@ class XenicsPanel(QFrame):
 
         for item in (NoFlip,FlipX,FlipY,full, cbox):
             layout1.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         #-- row 2
-        layout2 = QHBoxLayout()
+        layout2 = QHBoxLayout();layout2.setAlignment(QtCore.Qt.AlignLeft)
         label1 = QLabel("X0:", self)
-        X0 = QLineEdit("0")
+        X0 = QLineEdit("0");X0.setMaxLength(4);X0.setFixedWidth(40)
         label2 = QLabel("Y0:", self)
-        Y0 = QLineEdit("0")
+        Y0 = QLineEdit("0");Y0.setMaxLength(4);Y0.setFixedWidth(40)
+        label3 = QLabel("NX:", self)
+        NX = QLineEdit("640");NX.setMaxLength(4);NX.setFixedWidth(40)
+        label4 = QLabel("NY:", self)
+        NY = QLineEdit("512");NY.setMaxLength(4);NY.setFixedWidth(40)
 
-        for item in (label1,X0,label2,Y0):
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+        for item in (label1,X0,label2,Y0, label3,NX,label4,NY):
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             layout2.addWidget(item,alignment=QtCore.Qt.AlignLeft)
 
-        #-- row 3
-        layout3 = QHBoxLayout()
-        label3 = QLabel("NX:", self)
-        NX = QLineEdit("640")
-        label4 = QLabel("NY:", self)
-        NY = QLineEdit("512")
+        layout = QVBoxLayout()
+        for item in (layout1,layout2):
+            layout.addLayout(item)
+        return layout
 
-        for item in (label3,NX,label4,NY):
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
-            layout3.addWidget(item,alignment=QtCore.Qt.AlignLeft)
+    def makeScale(self):
 
-        layout.addLayout(layout1)
-        layout.addLayout(layout2)
-        layout.addLayout(layout3)
+        layout = QHBoxLayout();layout.setAlignment(QtCore.Qt.AlignLeft)
+
+        #label1 = QLabel("Scale:", self)
+
+        #-- radiobuttuns
+        autoScale = QRadioButton("Auto", self); autoScale.setChecked(True)
+        logScale = QRadioButton("Log", self)
+        clipScale = QRadioButton("Clip: ", self)
+        #-- clip value
+        label2 = QLabel("Max:", self)
+        clipScaleMax = QLineEdit("0");clipScaleMax.setMaxLength(5);clipScaleMax.setFixedWidth(50)
+        label3 = QLabel("Min:", self)
+        clipScaleMin = QLineEdit("10000");clipScaleMin.setMaxLength(5);clipScaleMin.setFixedWidth(50)
+
+        group=QButtonGroup(self)
+        for item in (autoScale,logScale,clipScale):
+            group.addButton(item)
+
+
+        #-- adding to layout
+        for item in (autoScale,logScale,clipScale, label2,clipScaleMax,label3,clipScaleMin):
+            layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
         return layout
 
     def makeTemperature(self):
 
-        layout = QVBoxLayout()
-
         #-- row 1
-        label1 = QLabel("Cam Temp (C)", self)
-        readTemp = QLineEdit("24.65", self)
+        label1 = QLabel("current Camera Temperature (C)", self)
+        readTemp = QLineEdit("24.65", self);readTemp.setMaxLength(6);readTemp.setFixedWidth(60)
         readTemp.setReadOnly(True)
         cooling = QRadioButton("Cooling",self)
         group = QButtonGroup(self); group.addButton(cooling)
         empty = QLabel("                                  ",self)
 
-        layout1 = QHBoxLayout()
+        layout1 = QHBoxLayout();layout1.setAlignment(QtCore.Qt.AlignLeft)
         for item in (label1,readTemp,cooling,empty):
             layout1.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         #-- row 2
-        label2 = QLabel("Set Temp (C)",self)
-        setTemp = QLineEdit("-25.00", self)
-        label3 = QLabel("Offset (C)",self)
-        offset = QLineEdit("63.50",self)
+        label2 = QLabel("Temperature (C) : Set",self)
+        setTemp = QLineEdit("-25.00", self);setTemp.setMaxLength(6);setTemp.setFixedWidth(60)
+        label3 = QLabel("Offset",self)
+        offsetTemp = QLineEdit("63.50",self);offsetTemp.setMaxLength(6);offsetTemp.setFixedWidth(60)
         empty = QLabel(" ",self)
 
-        layout2 = QHBoxLayout()
-        for item in (label2,setTemp,label3,offset):
+        layout2 = QHBoxLayout();layout2.setAlignment(QtCore.Qt.AlignLeft)
+        for item in (label2,setTemp,label3,offsetTemp):
             layout2.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-
+        layout = QVBoxLayout()
         layout.addLayout(layout1)
         layout.addLayout(layout2)
 
@@ -192,20 +172,17 @@ class XenicsPanel(QFrame):
 
     def makeSettingFile(self):
 
-        label1 = QLabel("Setting file",self)
-        setFile = QLineEdit("None", self)
-        loadSetFile = QPushButton("Load",self)
-        saveSetFile = QPushButton("Save as",self)
+        label1 = QLabel("Config:",self)
+        config = QLineEdit("None", self)
+        loadConfig = QPushButton("Load",self)
+        saveConfig = QPushButton("Save as",self)
 
-        layout = QHBoxLayout()
-        for item in (label1,setFile,loadSetFile,saveSetFile):
+        layout = QHBoxLayout();layout.setAlignment(QtCore.Qt.AlignLeft)
+        for item in (label1,config, loadConfig, saveConfig):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
-            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Minimum)
+            item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         return layout
-
-
-
 
     def setSelf(self, **kwags):
         for key, value in kwags.items():
