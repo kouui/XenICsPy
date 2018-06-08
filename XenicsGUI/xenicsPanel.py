@@ -1,4 +1,6 @@
 import sys
+from datetime import datetime
+
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QWidget, QFrame
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
@@ -52,13 +54,16 @@ class XenicsPanel(QFrame):
         label2 = QLabel("Preview :", self)
 
         #-- exposure
-        exposure = QLineEdit("1000");exposure.setMaxLength(4);exposure.setFixedWidth(40)
+        exposure = QLineEdit("1000");exposure.setMaxLength(4);exposure.setFixedWidth(40);exposure.name="exposure (ms)"
+        exposure.editingFinished.connect(self.setIntValue)
 
         #-- preview button
         start = QPushButton("Start", self)
         start.setToolTip('click here to start preview')
-        stop= QPushButton("stop", self)
+        start.clicked.connect(self.buttonPress)
+        stop = QPushButton("Stop", self);stop.setEnabled(False)
         stop.setToolTip('click here to start preview')
+        stop.clicked.connect(self.buttonPress)
 
         #-- adding to layout
         layout = QHBoxLayout();layout.setAlignment(QtCore.Qt.AlignLeft)
@@ -80,10 +85,13 @@ class XenicsPanel(QFrame):
         FlipY = QRadioButton("Flip-Y", self)
         group=QButtonGroup(self)
         for item in (NoFlip, FlipX, FlipY):
+            item.toggled.connect(self.setFlip)
             group.addButton(item)
 
         full = QPushButton("Full", self)
+        full.clicked.connect(self.buttonPress)
         cbox = QPushButton("Cbox", self)
+        cbox.clicked.connect(self.buttonPress)
 
         for item in (NoFlip,FlipX,FlipY,full, cbox):
             layout1.addWidget(item,alignment=QtCore.Qt.AlignLeft)
@@ -92,13 +100,15 @@ class XenicsPanel(QFrame):
         #-- row 2
         layout2 = QHBoxLayout();layout2.setAlignment(QtCore.Qt.AlignLeft)
         label1 = QLabel("X0:", self)
-        X0 = QLineEdit("0");X0.setMaxLength(4);X0.setFixedWidth(40)
+        X0 = QLineEdit("0");X0.setMaxLength(4);X0.setFixedWidth(40);X0.name="X0"
         label2 = QLabel("Y0:", self)
-        Y0 = QLineEdit("0");Y0.setMaxLength(4);Y0.setFixedWidth(40)
+        Y0 = QLineEdit("0");Y0.setMaxLength(4);Y0.setFixedWidth(40);Y0.name="Y0"
         label3 = QLabel("NX:", self)
-        NX = QLineEdit("640");NX.setMaxLength(4);NX.setFixedWidth(40)
+        NX = QLineEdit("640");NX.setMaxLength(4);NX.setFixedWidth(40);NX.name="NX"
         label4 = QLabel("NY:", self)
-        NY = QLineEdit("512");NY.setMaxLength(4);NY.setFixedWidth(40)
+        NY = QLineEdit("512");NY.setMaxLength(4);NY.setFixedWidth(40);NY.name="NY"
+        for item in (X0,Y0,NX,NY):
+            item.editingFinished.connect(self.setIntValue)
 
         for item in (label1,X0,label2,Y0, label3,NX,label4,NY):
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -107,6 +117,11 @@ class XenicsPanel(QFrame):
         layout = QVBoxLayout()
         for item in (layout1,layout2):
             layout.addLayout(item)
+
+        self.setSelf(X0=X0,Y0=Y0,NX=NX,NY=NY,full=full,cbox=cbox)
+        for item in (X0,Y0,NX,NY, full):
+            item.setEnabled(False)
+
         return layout
 
     def makeScale(self):
@@ -121,9 +136,11 @@ class XenicsPanel(QFrame):
         clipScale = QRadioButton("Clip: ", self)
         #-- clip value
         label2 = QLabel("Max:", self)
-        clipScaleMax = QLineEdit("0");clipScaleMax.setMaxLength(5);clipScaleMax.setFixedWidth(50)
+        clipScaleMax = QLineEdit("10000");clipScaleMax.setMaxLength(5);clipScaleMax.setFixedWidth(50)
         label3 = QLabel("Min:", self)
-        clipScaleMin = QLineEdit("10000");clipScaleMin.setMaxLength(5);clipScaleMin.setFixedWidth(50)
+        clipScaleMin = QLineEdit("0");clipScaleMin.setMaxLength(5);clipScaleMin.setFixedWidth(50)
+        for item in (clipScaleMin,clipScaleMax):
+            item.setEnabled(False)
 
         group=QButtonGroup(self)
         for item in (autoScale,logScale,clipScale):
@@ -131,7 +148,7 @@ class XenicsPanel(QFrame):
 
 
         #-- adding to layout
-        for item in (autoScale,logScale,clipScale, label2,clipScaleMax,label3,clipScaleMin):
+        for item in (autoScale,logScale,clipScale, label3,clipScaleMin,label2,clipScaleMax):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
@@ -141,12 +158,12 @@ class XenicsPanel(QFrame):
 
         #-- row 1
         label1 = QLabel("current Camera Temperature (C)", self)
-        readTemp = QLineEdit("24.65", self);readTemp.setMaxLength(6);readTemp.setFixedWidth(60)
-        readTemp.setReadOnly(True)
+        currentTemp = QLineEdit("24.65", self);currentTemp.setMaxLength(6);currentTemp.setFixedWidth(60)
+        currentTemp.setReadOnly(True)
         cooling = QCheckBox("Cooling",self)
 
         layout1 = QHBoxLayout();layout1.setAlignment(QtCore.Qt.AlignLeft)
-        for item in (label1,readTemp,cooling):
+        for item in (label1,currentTemp,cooling):
             layout1.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
@@ -155,7 +172,6 @@ class XenicsPanel(QFrame):
         setTemp = QLineEdit("-25.00", self);setTemp.setMaxLength(6);setTemp.setFixedWidth(60)
         label3 = QLabel("Offset",self)
         offsetTemp = QLineEdit("63.50",self);offsetTemp.setMaxLength(6);offsetTemp.setFixedWidth(60)
-        empty = QLabel(" ",self)
 
         layout2 = QHBoxLayout();layout2.setAlignment(QtCore.Qt.AlignLeft)
         for item in (label2,setTemp,label3,offsetTemp):
@@ -182,9 +198,76 @@ class XenicsPanel(QFrame):
 
         return layout
 
+
+    def setIntValue(self):
+
+        try:
+            value = int(self.sender().text()) # ms
+        except ValueError:
+            self.showTextInLog("Input value must be an integer")
+            return None
+
+        self.showTextInLog("{} -->> {}".format(self.sender().name,value))
+
+    def setFloatValue(self):
+
+        pass
+
+    def setStrValue(self):
+
+        pass
+
+    def buttonPress(self):
+
+        sender = self.sender()
+
+        if sender.text() == "Start":
+            self.showTextInLog("Preview started.")
+            self.start.setEnabled(False);self.stop.setEnabled(True)
+
+        elif sender.text() == "Stop":
+            self.showTextInLog("Preview stopped.")
+            self.start.setEnabled(True);self.stop.setEnabled(False)
+
+        elif sender.text() == "Full":
+
+            self.cbox.setEnabled(True);self.full.setEnabled(False)
+            for item in (self.X0,self.Y0,self.NX,self.NY):
+                item.setEnabled(False)
+
+            self.showTextInLog("View -->> {}".format(self.sender().text()))
+
+        elif sender.text() == "Cbox":
+
+            self.full.setEnabled(True);self.cbox.setEnabled(False)
+            for item in (self.X0,self.Y0,self.NX,self.NY):
+                item.setEnabled(True)
+
+            self.showTextInLog("View -->> {}".format(self.sender().text()))
+
+        else:
+            return None
+
+    def setFlip(self, event):
+
+        if event == True:
+            self.showTextInLog("Flip -->> {}".format(self.sender().text()))
+        else :
+            return None
+
     def setSelf(self, **kwags):
         for key, value in kwags.items():
             setattr(self, key, value)
+
+    def datetime2String(self, t=datetime.now()):
+        return t.strftime("%Y-%m-%d %H:%M:%S") + ".{}".format(t.microsecond)
+
+
+    def showTextInLog(self,text):
+        nowStr = self.datetime2String(t=datetime.now())
+        self.parent.parent.log.insertPlainText("{} : {} \n".format(nowStr, text))
+
+
 
 
 if __name__=="__main__":

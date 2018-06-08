@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QTabWidget
 
 from xenicsPanel import XenicsPanel
-from obsPanel import ObsPanel
+from observePanel import ObservePanel
 
 
 class Tab(QWidget):
@@ -15,21 +15,25 @@ class Tab(QWidget):
         mainLayout = QVBoxLayout()
 
         #--- initialize tab screen
-        self.tabs = QTabWidget()
-        self.tab1 = XenicsPanel(self.parent)
-        self.tab2 = ObsPanel(self.parent)
+        tabs = QTabWidget()
+        xenics = XenicsPanel(self)
+        observe = ObservePanel(self)
 
         #--- add tabs
-        for tab, name in zip([self.tab1,self.tab2],
+        for tab, name in zip([xenics,observe],
                             ["XenICs","Observation"]):
-            self.tabs.addTab(tab, name)
+            tabs.addTab(tab, name)
 
         #--- add tabs to widget
-        mainLayout.addWidget(self.tabs)
+        mainLayout.addWidget(tabs)
         self.setLayout(mainLayout)
+
+    def setSelf(self, **kwags):
+        for key, value in kwags.items():
+            setattr(self, key, value)
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    test = TabWidget(parent=None)
+    test = Tab(parent=None)
     test.show()
     sys.exit(app.exec_())

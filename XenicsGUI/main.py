@@ -4,6 +4,8 @@ date : 2018-06
 """
 
 import sys
+from datetime import datetime
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction
 
 from mainWidget import MainWidget
@@ -63,6 +65,16 @@ class MainWindow(QMainWindow):
 
         #--- define functionality of each action
         exitAction.triggered.connect(self.close)
+
+    def datetime2String(self, t=datetime.now()):
+        return t.strftime("%Y-%m-%d %H:%M:%S") + ".{}".format(t.microsecond)
+
+
+    def showTextInLog(self,text):
+
+        nowStr = self.datetime2String(t=datetime.now())
+        self.mainWidget.log.insertPlainText("{} : {} \n".format(nowStr, text))
+
 
 
 

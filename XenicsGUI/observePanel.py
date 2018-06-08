@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QRadioButton, QButtonGroup
 from PyQt5.QtWidgets import QSizePolicy
 
-class ObsPanel(QFrame):
+class ObservePanel(QFrame):
 
     def __init__(self, parent):
         super(QWidget, self).__init__(parent)
@@ -151,8 +151,11 @@ class ObsPanel(QFrame):
             setattr(self, key, value)
 
 
+
+
+
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    test = ObsPanel(parent=None)
+    test = ObservePanel(parent=None)
     test.show()
     sys.exit(app.exec_())

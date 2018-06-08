@@ -1,4 +1,6 @@
 import sys
+from datetime import datetime
+
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QTextEdit, QPushButton
@@ -24,13 +26,12 @@ class MainWidget(QWidget):
         control = Tab(self)
 
         #--- log
-        self.logWidget = QTextEdit()
-        self.logWidget.setReadOnly(True)
-        self.logWidget.insertPlainText("software initialized. \n")
+        log = QTextEdit()
+        log.setReadOnly(True)
 
         # setup layout
         layout_v.addWidget(control)
-        layout_v.addWidget(self.logWidget)
+        layout_v.addWidget(log)
 
         mainLayout.addLayout(layout_v, stretch=3)
         mainLayout.addWidget(figure,stretch=5)
@@ -38,11 +39,21 @@ class MainWidget(QWidget):
         self.setLayout(mainLayout)
 
         #-- set self
-        self.setSelf(figure=figure)
+        self.setSelf(figure=figure,log=log)
+        self.showTextInLog("Software initialized.")
 
     def setSelf(self, **kwags):
         for key, value in kwags.items():
             setattr(self, key, value)
+
+    def datetime2String(self, t=datetime.now()):
+        return t.strftime("%Y-%m-%d %H:%M:%S") + ".{}".format(t.microsecond)
+
+
+    def showTextInLog(self,text):
+
+        nowStr = self.datetime2String(t=datetime.now())
+        self.log.insertPlainText("{} : {} \n".format(nowStr, text))
 
 
 
