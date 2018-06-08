@@ -54,8 +54,8 @@ class XenicsPanel(QFrame):
         label2 = QLabel("Preview :", self)
 
         #-- exposure
-        exposure = QLineEdit("1000");exposure.setMaxLength(4);exposure.setFixedWidth(40);exposure.name="exposure (ms)"
-        exposure.editingFinished.connect(self.setIntValue)
+        exposure = QLineEdit("1000");exposure.setMaxLength(4);exposure.setFixedWidth(40);exposure.name="exposure"
+        exposure.returnPressed.connect(self.setIntValue)
 
         #-- preview button
         start = QPushButton("Start", self)
@@ -108,7 +108,7 @@ class XenicsPanel(QFrame):
         label4 = QLabel("NY:", self)
         NY = QLineEdit("512");NY.setMaxLength(4);NY.setFixedWidth(40);NY.name="NY"
         for item in (X0,Y0,NX,NY):
-            item.editingFinished.connect(self.setIntValue)
+            item.returnPressed.connect(self.setIntValue)
 
         for item in (label1,X0,label2,Y0, label3,NX,label4,NY):
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
@@ -133,17 +133,19 @@ class XenicsPanel(QFrame):
         #-- radiobuttuns
         autoScale = QRadioButton("Auto", self); autoScale.setChecked(True)
         logScale = QRadioButton("Log", self)
-        clipScale = QRadioButton("Clip: ", self)
+        clipScale = QRadioButton("Clip", self)
         #-- clip value
         label2 = QLabel("Max:", self)
-        clipScaleMax = QLineEdit("10000");clipScaleMax.setMaxLength(5);clipScaleMax.setFixedWidth(50)
+        clipScaleMax = QLineEdit("10000");clipScaleMax.setMaxLength(5);clipScaleMax.setFixedWidth(50);clipScaleMax.name="clipScaleMax"
         label3 = QLabel("Min:", self)
-        clipScaleMin = QLineEdit("0");clipScaleMin.setMaxLength(5);clipScaleMin.setFixedWidth(50)
+        clipScaleMin = QLineEdit("0");clipScaleMin.setMaxLength(5);clipScaleMin.setFixedWidth(50);clipScaleMin.name="clipScaleMin"
         for item in (clipScaleMin,clipScaleMax):
+            item.returnPressed.connect(self.setIntValue)
             item.setEnabled(False)
 
         group=QButtonGroup(self)
         for item in (autoScale,logScale,clipScale):
+            item.toggled.connect(self.setScale)
             group.addButton(item)
 
 
@@ -152,6 +154,7 @@ class XenicsPanel(QFrame):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
+        self.setSelf(clipScaleMin=clipScaleMin, clipScaleMax=clipScaleMax)
         return layout
 
     def makeTemperature(self):
@@ -161,6 +164,7 @@ class XenicsPanel(QFrame):
         currentTemp = QLineEdit("24.65", self);currentTemp.setMaxLength(6);currentTemp.setFixedWidth(60)
         currentTemp.setReadOnly(True)
         cooling = QCheckBox("Cooling",self)
+        cooling.toggled.connect(self.ifCooling)
 
         layout1 = QHBoxLayout();layout1.setAlignment(QtCore.Qt.AlignLeft)
         for item in (label1,currentTemp,cooling):
@@ -169,9 +173,12 @@ class XenicsPanel(QFrame):
 
         #-- row 2
         label2 = QLabel("Temperature (C) : Set",self)
-        setTemp = QLineEdit("-25.00", self);setTemp.setMaxLength(6);setTemp.setFixedWidth(60)
+        setTemp = QLineEdit("-25.00", self);setTemp.setMaxLength(6);setTemp.setFixedWidth(60);setTemp.name="setTemp"
         label3 = QLabel("Offset",self)
-        offsetTemp = QLineEdit("63.50",self);offsetTemp.setMaxLength(6);offsetTemp.setFixedWidth(60)
+        offsetTemp = QLineEdit("63.50",self);offsetTemp.setMaxLength(6);offsetTemp.setFixedWidth(60);offsetTemp.name="offsetTemp"
+
+        for item in (setTemp,offsetTemp):
+            item.returnPressed.connect(self.setFloatValue)
 
         layout2 = QHBoxLayout();layout2.setAlignment(QtCore.Qt.AlignLeft)
         for item in (label2,setTemp,label3,offsetTemp):
@@ -187,14 +194,20 @@ class XenicsPanel(QFrame):
     def makeSettingFile(self):
 
         label1 = QLabel("Config:",self)
-        config = QLineEdit("None", self)
+        config = QLineEdit("None", self);config.name="config"
+        config.returnPressed.connect(self.setStrValue)
         loadConfig = QPushButton("Load",self)
         saveConfig = QPushButton("Save as",self)
+
+        for item in (loadConfig,saveConfig):
+            item.clicked.connect(self.buttonPress)
 
         layout = QHBoxLayout();layout.setAlignment(QtCore.Qt.AlignLeft)
         for item in (label1,config, loadConfig, saveConfig):
             layout.addWidget(item,alignment=QtCore.Qt.AlignLeft)
             item.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
+        self.setSelf(config=config)
 
         return layout
 
@@ -202,7 +215,7 @@ class XenicsPanel(QFrame):
     def setIntValue(self):
 
         try:
-            value = int(self.sender().text()) # ms
+            value = int(self.sender().text())
         except ValueError:
             self.showTextInLog("Input value must be an integer")
             return None
@@ -211,11 +224,19 @@ class XenicsPanel(QFrame):
 
     def setFloatValue(self):
 
-        pass
+        try:
+            value = float(self.sender().text())
+        except ValueError:
+            self.showTextInLog("Input value must be a float")
+            return None
+
+        self.showTextInLog("{} -->> {}".format(self.sender().name,value))
 
     def setStrValue(self):
 
-        pass
+        value = self.sender().text()
+        self.showTextInLog("{} -->> {}".format(self.sender().name,value))
+
 
     def buttonPress(self):
 
@@ -245,6 +266,16 @@ class XenicsPanel(QFrame):
 
             self.showTextInLog("View -->> {}".format(self.sender().text()))
 
+        elif sender.text() == "Load":
+
+            self.showTextInLog("Loaded config file -->> {}".format(self.config.text()))
+            self.loadConfigFile(self.config.text())
+
+        elif sender.text() == "Save as":
+
+            self.showTextInLog("Saved config file to -->> {}".format(self.config.text()))
+            self.saveConfigFileAs(self.config.text())
+
         else:
             return None
 
@@ -254,6 +285,33 @@ class XenicsPanel(QFrame):
             self.showTextInLog("Flip -->> {}".format(self.sender().text()))
         else :
             return None
+
+    def setScale(self,event):
+
+        if event == True:
+            self.showTextInLog("Grey scale -->> {}".format(self.sender().text()))
+            isClip = (self.sender().text() == "Clip")
+            for item in (self.clipScaleMin,self.clipScaleMax):
+                item.setEnabled(isClip)
+        else :
+            return None
+
+    def ifCooling(self):
+
+        self.showTextInLog("Cooling  -->> {}".format(self.sender().isChecked()))
+
+        if self.sender().isChecked():
+            pass
+        else:
+            pass
+
+    def loadConfigFile(self, path):
+
+        pass
+
+    def saveConfigFileAs(self,path):
+
+        pass
 
     def setSelf(self, **kwags):
         for key, value in kwags.items():
