@@ -6,7 +6,7 @@ date : 2018-06
 import sys
 from datetime import datetime
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QFileDialog
 
 from mainWidget import MainWidget
 
@@ -56,15 +56,32 @@ class MainWindow(QMainWindow):
 
         #--- add menu into menubar
         fileMenu = mainMenu.addMenu("File")
+        logMenu = mainMenu.addMenu("Log")
 
-        #--- add action into menu "File"
+        #--- add action to menu "File"
         exitAction = QAction("Exit", self)
         exitAction.setStatusTip("Exit Application")
-        for action in [exitAction]:
+        for action in (exitAction,):
             fileMenu.addAction(action)
 
         #--- define functionality of each action
         exitAction.triggered.connect(self.close)
+
+        #--- add action to menu "Log"
+        saveLogAsAction = QAction("Save as", self)
+        saveLogAsAction.setStatusTip("Save Log as")
+        for action in (saveLogAsAction,):
+            logMenu.addAction(action)
+
+        #--- define functionality of each action
+        saveLogAsAction.triggered.connect(self.saveLogFile)
+
+    def saveLogFile(self):
+
+        filedialog = QFileDialog(self, directory="~/kouui/")
+        filedialog.setAcceptMode(QFileDialog.AcceptSave)
+        filedialog.open()
+
 
     def datetime2String(self, t=datetime.now()):
         return t.strftime("%Y-%m-%d %H:%M:%S") + ".{}".format(t.microsecond)
