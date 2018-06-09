@@ -78,9 +78,13 @@ class MainWindow(QMainWindow):
 
     def saveLogFile(self):
 
-        filedialog = QFileDialog(self, directory="~/kouui/")
-        filedialog.setAcceptMode(QFileDialog.AcceptSave)
-        filedialog.open()
+        name = QFileDialog.getSaveFileName(self, 'Save File')[0]
+        if name == '':
+            return None
+        else:
+            with open(name,'a') as file:
+                file.write(self.mainWidget.log.toPlainText())
+
 
 
     def datetime2String(self, t=datetime.now()):
